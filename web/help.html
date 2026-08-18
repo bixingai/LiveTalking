@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用教程 - LiveTalking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --bg: #f0f4fc;
+            --card-bg: rgba(255,255,255,0.9);
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: rgba(15,23,42,0.08);
+            --radius: 14px;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 48px;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand { font-weight: 700; }
+        .nav-link-soft {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .nav-link-soft:hover { color: #fff; }
+        .page-shell { max-width: 1120px; }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        .section-pad { padding: 24px; }
+        .eyebrow {
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        h1 { font-weight: 750; letter-spacing: 0; }
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 720;
+            margin-bottom: 14px;
+        }
+        h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        p, li { color: #334155; }
+        .muted { color: var(--muted); }
+        .step {
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            gap: 14px;
+            padding: 14px 0;
+            border-top: 1px solid var(--border);
+        }
+        .step:first-child { border-top: 0; padding-top: 0; }
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .example {
+            border-left: 4px solid var(--primary);
+            padding: 14px 16px;
+            background: rgba(67,97,238,0.07);
+            border-radius: 0 10px 10px 0;
+        }
+        .kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid #cbd5e1;
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 0.85rem;
+            color: #0f172a;
+        }
+        .screenshot {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 30px rgba(15,23,42,0.12);
+        }
+        .callout {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #7c2d12;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .checklist li {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        .checklist i { color: #10b981; margin-top: 2px; }
+        code {
+            color: #334155;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            .section-pad { padding: 18px; }
+            .step { grid-template-columns: 30px 1fr; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand text-decoration-none text-white" href="/index.html"><i class="bi bi-camera-video-fill me-2"></i>LiveTalking</a>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="/index.html" class="nav-link-soft">主页</a>
+            <a href="/index-en.html" class="nav-link-soft">English</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container page-shell mt-4">
+    <section class="glass-card section-pad">
+        <div class="eyebrow mb-2">Help / Tutorial</div>
+        <h1 class="mb-3">LiveTalking 使用教程</h1>
+        <p class="lead mb-0">按这个顺序操作：先建立 WebRTC 连接，再用文本或音频驱动数字人说话。页面右上角从 <span class="kbd">未连接</span> 变成 <span class="kbd">已连接</span> 后，才可以发送内容。</p>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <section class="glass-card section-pad">
+                <h2><i class="bi bi-play-circle me-2 text-primary"></i>最快上手</h2>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div>
+                        <h3>打开主页</h3>
+                        <p class="mb-0">访问 <code>http://127.0.0.1:8010/index.html</code>。看到右上角 <span class="kbd">未连接</span> 是正常状态。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div>
+                        <h3>点击“开始连接”</h3>
+                        <p class="mb-0">三个输入框可以先留空。连接成功后，右上角会显示 <span class="kbd">已连接</span> 和一个 <span class="kbd">SID</span>。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div>
+                        <h3>发送一段文字</h3>
+                        <p class="mb-0">在“文本驱动”里保留 <span class="kbd">Echo 复读</span>，输入一句话，点击“发送”。数字人会用 TTS 播放这段话并同步口型。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div>
+                        <h3>需要停下时点击“打断”</h3>
+                        <p class="mb-0">长文本播放中可以用“打断”清空当前播报，再发送新的内容。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card section-pad">
+                <h2><i class="bi bi-image me-2 text-primary"></i>页面截图</h2>
+                <img class="screenshot" src="/tutorial-index.jpg" alt="LiveTalking main page screenshot">
+                <p class="small muted mt-3 mb-0">连接区在左侧，文本/音频/录制/动作控制在右侧。实际页面会根据窗口宽度自动换行。</p>
+            </section>
+        </div>
+
+        <div class="col-lg-5">
+            <section class="glass-card section-pad">
+                <h2><i class="bi bi-lightbulb me-2 text-primary"></i>真实使用例子</h2>
+                <div class="example mb-3">
+                    <h3>客服欢迎语</h3>
+                    <p class="mb-2">选择 <span class="kbd">Echo 复读</span>，输入：</p>
+                    <p class="mb-0"><code>您好，欢迎来到我们的直播间。请告诉我您想了解哪款产品。</code></p>
+                </div>
+                <div class="example mb-3">
+                    <h3>课程讲解</h3>
+                    <p class="mb-2">输入一段分句清楚的讲稿，例如：</p>
+                    <p class="mb-0"><code>今天我们学习三个重点。第一，什么是实时数字人。第二，如何连接 WebRTC。第三，如何用文本驱动播报。</code></p>
+                </div>
+                <div class="example">
+                    <h3>直播口播切换</h3>
+                    <p class="mb-2">正在播放时勾选“打断”，发送新文案：</p>
+                    <p class="mb-0"><code>现在进入限时优惠环节，请看屏幕右侧的商品链接。</code></p>
+                </div>
+            </section>
+
+            <section class="glass-card section-pad">
+                <h2><i class="bi bi-sliders me-2 text-primary"></i>常用控件</h2>
+                <ul class="checklist">
+                    <li><i class="bi bi-check-circle-fill"></i><span><strong>Avatar ID</strong>：留空时使用服务启动时的默认形象。</span></li>
+                    <li><i class="bi bi-check-circle-fill"></i><span><strong>参考音频</strong>：EdgeTTS 里可填写音色名，例如 <code>zh-CN-YunxiaNeural</code>。</span></li>
+                    <li><i class="bi bi-check-circle-fill"></i><span><strong>Echo 复读</strong>：直接播报你输入的文本，适合本地测试。</span></li>
+                    <li><i class="bi bi-check-circle-fill"></i><span><strong>Chat LLM</strong>：让后端调用大模型回复，需要配置 <code>DASHSCOPE_API_KEY</code>。</span></li>
+                    <li><i class="bi bi-check-circle-fill"></i><span><strong>上传音频</strong>：上传音频文件后用原音频驱动口型。</span></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <section class="glass-card section-pad">
+        <h2><i class="bi bi-bug me-2 text-primary"></i>如果没有反应</h2>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <h3>仍然显示“未连接”</h3>
+                <p class="mb-0">确认已经点击“开始连接”。如果弹出错误，先刷新页面再重试一次。</p>
+            </div>
+            <div class="col-md-4">
+                <h3>可以连接但不说话</h3>
+                <p class="mb-0">先用 <span class="kbd">Echo 复读</span> 测试，不要先用 Chat LLM。Chat 需要大模型 API Key。</p>
+            </div>
+            <div class="col-md-4">
+                <h3>想确认服务状态</h3>
+                <p class="mb-0">打开 <a href="/admin.html">管理后台</a> 查看当前配置和会话列表。</p>
+            </div>
+        </div>
+        <div class="callout mt-3">
+            <strong>本地测试建议：</strong>先留空连接参数，连接成功后发送一句短文本。等这条链路稳定，再尝试自定义音色、上传音频、录制和 Chat LLM。
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
