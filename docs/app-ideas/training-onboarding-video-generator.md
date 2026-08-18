@@ -1,5 +1,9 @@
 # Training and Onboarding Video Generator
 
+## Product Name: Teachora
+
+Teachora combines "teach" with a polished, approachable ending. The teaching cue makes the purpose easy to understand, while the distinct sound gives the product room to grow beyond basic video generation into onboarding, enablement, compliance, and customer education workflows.
+
 ## One-Line Concept
 
 A SaaS tool that turns onboarding scripts, training lessons, and sales enablement content into digital-human presenter videos.

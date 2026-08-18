@@ -1,5 +1,9 @@
 # Digital Human Customer Support Widget
 
+## Product Name: Helpora
+
+Helpora starts with the universally understood word "help" and adds a softer, more memorable brand ending. It communicates assistance without sounding like a traditional ticketing system, which fits a support experience built around a welcoming digital human, quick answers, and human handoff when needed.
+
 ## One-Line Concept
 
 A website support widget where customers talk to a branded digital-human assistant that answers product, service, and onboarding questions from a company knowledge base.

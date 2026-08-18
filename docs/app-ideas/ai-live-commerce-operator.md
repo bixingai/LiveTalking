@@ -1,5 +1,9 @@
 # AI Live Commerce Operator
 
+## Product Name: Shopora
+
+Shopora combines "shop" with a warm, brandable ending that suggests energy and presence. The name immediately connects to commerce while still feeling like a distinct product rather than a generic store tool. It fits the idea because the product helps merchants turn live product demonstrations, scripts, and customer questions into more active selling moments.
+
 ## One-Line Concept
 
 A SaaS operator console that lets small brands run an AI digital-human livestream host for product selling, customer Q&A, replay clips, and campaign scripts.
