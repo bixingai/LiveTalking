@@ -93,13 +93,13 @@ Linux CUDA environment setup: <https://zhuanlan.zhihu.com/p/674972886>
 python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 ```
 
-> **Note**: The server must open ports TCP:8010, UDP:1-65536
+> **Note**: The server must open ports TCP:5555, UDP:1-65536
 
 ### 2.3 Client Access
 
 | Method | Description |
 |--------|-------------|
-| Browser | Open `http://serverip:8010/index.html`, click "Start Connection" to play the digital human video, then enter text and submit |
+| Browser | Open `http://serverip:5555/index.html`, click "Start Connection" to play the digital human video, then enter text and submit |
 | API | See [API Docs](docs/api.md) for HTTP-based integration |
 | Desktop App | Download: <https://pan.quark.cn/s/d7192d8ac19b> |
 

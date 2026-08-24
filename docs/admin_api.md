@@ -40,7 +40,7 @@ GET /api/admin/config
       "transport": "webrtc",
       "push_url": "http://localhost:1985/rtc/v1/whip/?app=live&stream=livestream",
       "max_session": 1,
-      "listenport": 8010,
+      "listenport": 5555,
       "customopt": []
     }
   }
@@ -69,7 +69,7 @@ GET /api/admin/config
 | `transport` | string | "webrtc" | 输出传输方式：rtcpush / webrtc / rtmp / virtualcam |
 | `push_url` | string | — | RTCPush 目标地址 |
 | `max_session` | int | 1 | 最大会话数 |
-| `listenport` | int | 8010 | HTTP 监听端口 |
+| `listenport` | int | 5555 | HTTP 监听端口 |
 | `customopt` | array | [] | 自定义动作配置（已解析） |
 
 ---

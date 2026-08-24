@@ -97,14 +97,14 @@ python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 ```
 
 
->  **注意**: 服务端需开放端口 TCP:8010, UDP:1-65536  
+>  **注意**: 服务端需开放端口 TCP:5555, UDP:1-65536
 
 
 ### 2.3 客户端接入
 
 | 方式 | 说明 |
 |------|------|
-| 浏览器 | 打开 `http://serverip:8010/index.html`，点击"开始连接"播放数字人视频，在文本框输入文字提交即可 |
+| 浏览器 | 打开 `http://serverip:5555/index.html`，点击"开始连接"播放数字人视频，在文本框输入文字提交即可 |
 | API 调用 | 参考 [API 文档](docs/api.md) 通过 HTTP 接口驱动 |
 | 桌面客户端 | 下载地址: <https://pan.quark.cn/s/d7192d8ac19b> |
 

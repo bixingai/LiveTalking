@@ -14,7 +14,7 @@ python app.py --transport virtualcam --model wav2lip --avatar_id wav2lip256_avat
 
 ### 2. 打开控制页面
 
-浏览器访问：**http://localhost:8010/virtualcam.html**
+浏览器访问：**http://localhost:5555/virtualcam.html**
 
 ### 3. 控制数字人
 
@@ -135,7 +135,7 @@ python app.py  # 自动加载 config.yaml
 
 ## 控制页面功能
 
-访问：**http://localhost:8010/virtualcam.html**
+访问：**http://localhost:5555/virtualcam.html**
 
 ### 功能模块
 
@@ -157,22 +157,22 @@ python app.py  # 自动加载 config.yaml
 
 ```bash
 # 发送文本
-curl -X POST http://localhost:8010/human \
+curl -X POST http://localhost:5555/human \
   -H "Content-Type: application/json" \
   -d '{"sessionid":"0","type":"echo","text":"你好"}'
 
 # 打断说话
-curl -X POST http://localhost:8010/interrupt_talk \
+curl -X POST http://localhost:5555/interrupt_talk \
   -H "Content-Type: application/json" \
   -d '{"sessionid":"0"}'
 
 # 查询状态
-curl -X POST http://localhost:8010/is_speaking \
+curl -X POST http://localhost:5555/is_speaking \
   -H "Content-Type: application/json" \
   -d '{"sessionid":"0"}'
 
 # 获取完整配置
-curl http://localhost:8010/api/virtualcam/status
+curl http://localhost:5555/api/virtualcam/status
 ```
 
 ---
@@ -281,7 +281,7 @@ pip install pyvirtualcam
 3. 发送测试：
 
    ```bash
-   curl -X POST http://localhost:8010/human -H "Content-Type: application/json" -d '{"sessionid":"0","type":"echo","text":"测试"}'
+   curl -X POST http://localhost:5555/human -H "Content-Type: application/json" -d '{"sessionid":"0","type":"echo","text":"测试"}'
    ```
 
 ### Q7: 音频延迟严重

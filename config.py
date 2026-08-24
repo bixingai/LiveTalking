@@ -86,7 +86,7 @@ def parse_args():
     parser.add_argument('--push_url', type=str,
                         default='http://localhost:1985/rtc/v1/whip/?app=live&stream=livestream')
     parser.add_argument('--max_session', type=int, default=5)
-    parser.add_argument('--listenport', type=int, default=8010,
+    parser.add_argument('--listenport', type=int, default=5555,
                         help="web listen port")
 
     # ─── 虚拟摄像头 ───────────────────────────────────────────────────
