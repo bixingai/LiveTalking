@@ -20,6 +20,9 @@ models/
 *.log
 dist
 .venv/
+.qwen-tts-venv/
 .run/
 .downloads/
+models/qwen3-tts-voices/
+models/qwen3-tts-test/
 avatars/wav2lip/face_detection/detection/sfd/s3fd.pth
