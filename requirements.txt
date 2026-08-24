@@ -53,6 +53,6 @@ dashscope
 #onnxruntime-gpu
 
 # Local ASR server (SenseVoice/FunASR) — Issue #604
-# Optional: remove these lines if you don't need local ASR
-#funasr
-#modelscope
+# Optional local ASR dependencies. The endpoint is enabled when installed.
+funasr
+modelscope

@@ -95,6 +95,8 @@ python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 
 For a shortcut-friendly Windows launch, run `start-local.bat` from this repository root.
 
+Voice cloning and local ASR setup: [Voice Cloning Setup](docs/voice-cloning.md).
+
 > **Note**: The server must open ports TCP:5555, UDP:1-65536
 
 ### 2.3 Client Access

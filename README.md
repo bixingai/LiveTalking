@@ -98,6 +98,8 @@ python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 
 For a shortcut-friendly Windows launch, run `start-local.bat` from this repository root.
 
+语音克隆和本地语音识别配置请参考：[语音克隆配置](docs/voice-cloning.md)。
+
 
 >  **注意**: 服务端需开放端口 TCP:5555, UDP:1-65536
 
