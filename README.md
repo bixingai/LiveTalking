@@ -96,6 +96,8 @@ Linux CUDA 环境搭建参考: <https://zhuanlan.zhihu.com/p/674972886>
 python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 ```
 
+For a shortcut-friendly Windows launch, run `start-local.bat` from this repository root.
+
 
 >  **注意**: 服务端需开放端口 TCP:5555, UDP:1-65536
 
