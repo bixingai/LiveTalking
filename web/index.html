@@ -72,6 +72,34 @@
         pre { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-size: 0.8rem; max-height: 120px; overflow-y: auto; }
         label { font-weight: 500; font-size: 0.9rem; color: #64748b; margin-bottom: 4px; }
         .param-hint { font-size: 0.75rem; color: #94a3b8; }
+        .text-status { font-size: 0.8rem; color: #64748b; }
+        .text-status.busy { color: #b45309; }
+        .text-status.playing { color: #047857; }
+        .help-button { position: relative; }
+        .help-button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 20;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            width: max-content;
+            max-width: 260px;
+            padding: 7px 9px;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 400;
+            line-height: 1.35;
+            text-align: left;
+            white-space: normal;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, 4px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .help-button:hover::after,
+        .help-button:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
         ::placeholder { color: #9ca3af !important; opacity: 1; }
         :-ms-input-placeholder { color: #9ca3af; }
     </style>
@@ -132,7 +160,9 @@
                     <div class="row g-2 align-items-end mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Avatar ID</label>
-                            <input type="text" class="form-control form-control-sm" id="offerAvatar" placeholder="wav2lip256_avatar1">
+                            <select class="form-select form-select-sm" id="offerAvatar">
+                                <option value="wav2lip256_avatar1">wav2lip256_avatar1（默认）</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">参考音频</label>
@@ -144,13 +174,14 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="btn-primary-custom" id="btnStart" onclick="start()"><i class="bi bi-play-fill"></i> 开始连接</button>
-                        <button class="btn-danger-custom" id="btnStop" onclick="stop()" style="display:none;"><i class="bi bi-stop-fill"></i> 断开连接</button>
+                        <button class="btn-primary-custom help-button" id="btnStart" onclick="start()" data-tooltip="建立 WebRTC 实时连接。发送文本、上传音频或录制前必须先连接。" title="建立 WebRTC 实时连接。发送文本、上传音频或录制前必须先连接。"><i class="bi bi-play-fill"></i> 开始连接</button>
+                        <button class="btn-danger-custom help-button" id="btnStop" onclick="stop()" style="display:none;" data-tooltip="断开当前实时会话。未完成的手动录制会被中止，请先停止录制。" title="断开当前实时会话。未完成的手动录制会被中止，请先停止录制。"><i class="bi bi-stop-fill"></i> 断开连接</button>
+                        <button class="btn-outline-custom help-button" id="btnReset" onclick="resetStream()" style="display:none;" data-tooltip="结束当前连接并重新建立实时画面，适合画面卡住或切换 Avatar 后使用。" title="结束当前连接并重新建立实时画面，适合画面卡住或切换 Avatar 后使用。"><i class="bi bi-arrow-clockwise"></i> 重置实时画面</button>
                     </div>
                     <div id="offerError" class="alert alert-danger mt-3" role="alert" style="display:none;"></div>
                     <div class="mt-3">
                         <video id="video" autoplay playsinline muted controls></video>
-                        <audio id="audio" autoplay></audio>
+                        <audio id="audio" autoplay controls></audio>
                     </div>
                 </div>
             </div>
@@ -175,9 +206,10 @@
                             <input class="form-check-input" type="checkbox" id="txtInterrupt" checked>
                             <label class="form-check-label small">打断</label>
                         </div>
-                        <button class="btn-primary-custom btn-sm ms-auto" onclick="sendText()"><i class="bi bi-send"></i> 发送</button>
-                        <button class="btn-outline-custom btn-sm" onclick="interrupt()"><i class="bi bi-stop-circle"></i> 打断</button>
+                        <button class="btn-primary-custom btn-sm ms-auto help-button" id="btnSendText" onclick="sendText()" data-tooltip="把输入文本送给数字人播放。播放或生成期间按钮会暂时锁定。" title="把输入文本送给数字人播放。播放或生成期间按钮会暂时锁定。"><i class="bi bi-send"></i> 发送</button>
+                        <button class="btn-outline-custom btn-sm help-button" id="btnInterrupt" onclick="interrupt()" data-tooltip="立即停止当前语音和动作，适合需要更换文案或纠正内容时使用。" title="立即停止当前语音和动作，适合需要更换文案或纠正内容时使用。"><i class="bi bi-stop-circle"></i> 打断</button>
                     </div>
+                    <div class="text-status mt-2" id="textStatus">待机</div>
                 </div>
             </div>
 
@@ -186,7 +218,7 @@
                 <div class="card-header"><i class="bi bi-mic-fill"></i> 音频驱动 (POST /humanaudio)</div>
                 <div class="card-body">
                     <input type="file" class="form-control form-control-sm mb-2" id="audioFile" accept="audio/*">
-                    <button class="btn-primary-custom btn-sm" onclick="uploadAudio()"><i class="bi bi-upload"></i> 上传并播放</button>
+                    <button class="btn-primary-custom btn-sm help-button" onclick="uploadAudio()" data-tooltip="上传音频文件并驱动当前已连接的数字人播放。需要先连接 WebRTC。" title="上传音频文件并驱动当前已连接的数字人播放。需要先连接 WebRTC。"><i class="bi bi-upload"></i> 上传并播放</button>
                 </div>
             </div>
 
@@ -195,8 +227,17 @@
                 <div class="card-header"><i class="bi bi-record-circle"></i> 录制控制 (POST /record)</div>
                 <div class="card-body">
                     <div class="d-flex gap-2">
-                        <button class="btn-outline-custom btn-sm" id="btnRecToggle" onclick="toggleRecord()"><i class="bi bi-record-circle"></i> 开始录制</button>
-                        <button class="btn-outline-custom btn-sm" id="btnDownload" onclick="downloadRecord()" disabled><i class="bi bi-download"></i> 下载录像</button>
+                        <button class="btn-outline-custom btn-sm help-button" id="btnRecToggle" onclick="toggleRecord()" data-tooltip="手动录制路径：保持连接，点击开始录制，播放内容后再点击停止录制。" title="手动录制路径：保持连接，点击开始录制，播放内容后再点击停止录制。"><i class="bi bi-record-circle"></i> 开始录制</button>
+                        <button class="btn-outline-custom btn-sm help-button" id="btnDownload" onclick="downloadRecord()" disabled data-tooltip="下载已经完成的 MP4。录制进行中不可下载；自动录制完成后即使已断开连接也可以下载。" title="下载已经完成的 MP4。录制进行中不可下载；自动录制完成后即使已断开连接也可以下载。"><i class="bi bi-download"></i> 下载录像</button>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="autoRecord" checked>
+                        <label class="form-check-label small" for="autoRecord">发送后自动生成可下载 MP4</label>
+                    </div>
+                    <div class="text-status mt-2" id="recordStatus">尚未生成录像。自动录制开启时，发送文本后会自动录制并在播放结束后生成 MP4。</div>
+                    <div class="alert alert-success mt-2 mb-0 py-2" id="downloadNotice" style="display:none;">
+                        <i class="bi bi-check-circle me-1"></i><span id="downloadNoticeText">MP4 已生成</span>
+                        <a id="recordDownloadLink" class="alert-link ms-2" href="#" download>直接下载 MP4</a>
                     </div>
                 </div>
             </div>
@@ -211,7 +252,7 @@
                             <input type="number" class="form-control form-control-sm" id="audiotypeVal" value="2" min="2">
                         </div>
                         <div class="col-6">
-                            <button class="btn-primary-custom btn-sm w-100" onclick="setAudiotype()"><i class="bi bi-arrow-right-circle"></i> 切换状态</button>
+                            <button class="btn-primary-custom btn-sm w-100 help-button" onclick="setAudiotype()" data-tooltip="切换数字人的动作状态索引，用于测试不同预设动作。需要先连接 WebRTC。" title="切换数字人的动作状态索引，用于测试不同预设动作。需要先连接 WebRTC。"><i class="bi bi-arrow-right-circle"></i> 切换状态</button>
                         </div>
                     </div>
                 </div>
@@ -224,6 +265,37 @@
 <script>
 let pc = null;
 let sessionid = null;
+let lastRecordSessionid = null;
+let speakingPoll = null;
+let textRequestBusy = false;
+let autoRecording = false;
+
+function loadAvatarProfiles() {
+    Promise.all([
+        fetch('/api/avatar/profiles').then(r => r.json()),
+        fetch('/api/avatar/tasks').then(r => r.json()),
+    ]).then(([profilesPayload, tasksPayload]) => {
+        const select = document.getElementById('offerAvatar');
+        const profiles = profilesPayload.data?.profiles || [];
+        const tasks = tasksPayload.data?.tasks || [];
+        const ids = ['wav2lip256_avatar1'];
+        profiles.forEach(profile => {
+            if (profile.avatar_id && !ids.includes(profile.avatar_id)) ids.push(profile.avatar_id);
+        });
+        tasks.filter(task => task.status === 'completed' && task.avatar_id)
+            .forEach(task => { if (!ids.includes(task.avatar_id)) ids.push(task.avatar_id); });
+        select.innerHTML = '';
+        ids.forEach(id => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = id + (id === 'wav2lip256_avatar1' ? '（默认）' : '（已生成）');
+            if (id === 'andy-wav2lip-256') option.selected = true;
+            select.appendChild(option);
+        });
+    }).catch(error => console.warn('Avatar profile loading failed:', error));
+}
+
+loadAvatarProfiles();
 
 function updateStatus(connected) {
     const badge = document.getElementById('statusBadge');
@@ -300,8 +372,15 @@ function start() {
     }
     pc = new RTCPeerConnection(config);
     pc.addEventListener('track', evt => {
-        if (evt.track.kind === 'video') document.getElementById('video').srcObject = evt.streams[0];
-        else document.getElementById('audio').srcObject = evt.streams[0];
+        if (evt.track.kind === 'video') {
+            document.getElementById('video').srcObject = evt.streams[0];
+        } else {
+            const audio = document.getElementById('audio');
+            audio.srcObject = evt.streams[0];
+            audio.muted = false;
+            audio.volume = 1;
+            audio.play().catch(() => showError('浏览器阻止了音频自动播放，请点击音频控件的播放按钮。'));
+        }
     });
     pc.addEventListener('connectionstatechange', () => {
         if (pc.connectionState === 'connected') updateStatus(true);
@@ -310,16 +389,28 @@ function start() {
     negotiate();
     document.getElementById('btnStart').style.display = 'none';
     document.getElementById('btnStop').style.display = 'inline-block';
+    document.getElementById('btnReset').style.display = 'inline-block';
 }
 
 function stop() {
+    if (speakingPoll) { clearInterval(speakingPoll); speakingPoll = null; }
+    textRequestBusy = false;
+    setTextStatus('待机');
+    setSendEnabled(true);
     if (pc) { pc.close(); pc = null; }
     updateStatus(false);
     setSessionId(null);
     document.getElementById('btnStart').style.display = 'inline-block';
     document.getElementById('btnStop').style.display = 'none';
+    document.getElementById('btnReset').style.display = 'none';
     document.getElementById('video').srcObject = null;
     document.getElementById('audio').srcObject = null;
+}
+
+function resetStream() {
+    stop();
+    setTextStatus('正在重新连接...');
+    setTimeout(start, 250);
 }
 
 // ─── Text ──────────────────────────────────────────────────
@@ -328,6 +419,11 @@ function sendText() {
     const type = document.getElementById('txtType').value;
     const interrupt = document.getElementById('txtInterrupt').checked;
     if (!text || !sessionid) return alert('请先连接 WebRTC');
+    if (textRequestBusy) return;
+
+    textRequestBusy = true;
+    setSendEnabled(false);
+    setTextStatus('正在提交，等待语音生成...', 'busy');
 
     fetch('/human', {
         method: 'POST',
@@ -336,6 +432,118 @@ function sendText() {
     }).then(r => r.json()).then(d => {
         console.log('human:', d);
         document.getElementById('txtMessage').value = '';
+        if (d.code !== 0) throw new Error(d.msg || '文本提交失败');
+        watchSpeaking();
+    }).catch(e => {
+        console.error('human error:', e);
+        textRequestBusy = false;
+        setSendEnabled(true);
+        setTextStatus('提交失败，请重试', 'busy');
+    });
+}
+
+function setSendEnabled(enabled) {
+    const btn = document.getElementById('btnSendText');
+    btn.disabled = !enabled;
+    btn.innerHTML = enabled
+        ? '<i class="bi bi-send"></i> 发送'
+        : '<span class="spinner-border spinner-border-sm me-1"></span>生成中...';
+}
+
+function setTextStatus(text, mode = '') {
+    const el = document.getElementById('textStatus');
+    el.textContent = text;
+    el.className = 'text-status mt-2' + (mode ? ' ' + mode : '');
+}
+
+function watchSpeaking() {
+    if (speakingPoll) clearInterval(speakingPoll);
+    let hasSpoken = false;
+    let startedAt = Date.now();
+    speakingPoll = setInterval(() => {
+        if (!sessionid || Date.now() - startedAt > 120000) {
+            clearInterval(speakingPoll);
+            speakingPoll = null;
+            textRequestBusy = false;
+            setSendEnabled(true);
+            setTextStatus('待机');
+            return;
+        }
+        fetch('/is_speaking', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionid: String(sessionid) }),
+        }).then(r => r.json()).then(d => {
+            const speaking = Boolean(d.data);
+            if (speaking) {
+                if (!hasSpoken) {
+                    hasSpoken = true;
+                    if (document.getElementById('autoRecord').checked) {
+                        startAutoRecording();
+                    }
+                }
+                setTextStatus(autoRecording ? '正在播放并录制 MP4' : '正在播放', 'playing');
+            } else if (hasSpoken) {
+                clearInterval(speakingPoll);
+                speakingPoll = null;
+                if (autoRecording) {
+                    finishAutoRecording();
+                } else {
+                    textRequestBusy = false;
+                    setSendEnabled(true);
+                    setTextStatus('播放完成，待机中');
+                }
+            } else {
+                setTextStatus('正在生成语音...', 'busy');
+            }
+        }).catch(() => {});
+    }, 500);
+}
+
+function startAutoRecording() {
+    if (!sessionid || autoRecording) return;
+    autoRecording = true;
+    document.getElementById('recordStatus').textContent = '正在录制本次播放...';
+    fetch('/record', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'start_record', sessionid: String(sessionid) }),
+    }).then(r => r.json()).then(d => {
+        if (d.code !== 0) throw new Error(d.msg || '无法开始录制');
+    }).catch(e => {
+        console.error('auto record start error:', e);
+        autoRecording = false;
+        document.getElementById('recordStatus').textContent = '自动录制失败';
+    });
+}
+
+function finishAutoRecording() {
+    const recordSessionid = sessionid;
+    if (!recordSessionid || !autoRecording) return;
+    fetch('/record', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'end_record', sessionid: String(recordSessionid) }),
+    }).then(r => r.json()).then(d => {
+        if (d.code !== 0) throw new Error(d.msg || '无法完成录像');
+        lastRecordSessionid = recordSessionid;
+        document.getElementById('btnDownload').disabled = false;
+        const fileName = 'livetalking-' + recordSessionid + '.mp4';
+        document.getElementById('recordStatus').textContent = 'MP4 已生成；服务器文件：data/record/' + recordSessionid + '.mp4';
+        document.getElementById('downloadNoticeText').textContent = fileName + ' 已生成';
+        const downloadLink = document.getElementById('recordDownloadLink');
+        downloadLink.href = '/record/' + encodeURIComponent(recordSessionid);
+        downloadLink.download = fileName;
+        document.getElementById('downloadNotice').style.display = 'block';
+        autoRecording = false;
+        textRequestBusy = false;
+        setSendEnabled(true);
+        // This is a live WebRTC session, so close it after the utterance.
+        stop();
+        setTextStatus('播放完成，MP4 已生成');
+    }).catch(e => {
+        console.error('auto record stop error:', e);
+        autoRecording = false;
+        textRequestBusy = false;
+        setSendEnabled(true);
+        setTextStatus('播放完成，但 MP4 生成失败', 'busy');
     });
 }
 
@@ -359,7 +567,13 @@ function interrupt() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionid: String(sessionid) }),
-    }).then(r => r.json()).then(d => console.log('interrupt:', d));
+    }).then(r => r.json()).then(d => {
+        console.log('interrupt:', d);
+        if (speakingPoll) { clearInterval(speakingPoll); speakingPoll = null; }
+        textRequestBusy = false;
+        setSendEnabled(true);
+        setTextStatus('已打断，待机中');
+    });
 }
 
 // ─── Speaking Status ───────────────────────────────────────
@@ -396,9 +610,32 @@ function toggleRecord() {
         }
     });
 }
-function downloadRecord() {
-    if (!sessionid) return;
-    window.open('/record/' + sessionid, '_blank');
+async function downloadRecord() {
+    const recordId = lastRecordSessionid || sessionid;
+    if (!recordId) return;
+    const btn = document.getElementById('btnDownload');
+    const status = document.getElementById('recordStatus');
+    btn.disabled = true;
+    status.textContent = '正在准备下载 MP4...';
+    try {
+        const response = await fetch('/record/' + encodeURIComponent(recordId));
+        if (!response.ok) throw new Error('录像文件不存在或尚未完成');
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'livetalking-' + recordId + '.mp4';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    status.textContent = '下载已触发：livetalking-' + recordId + '.mp4（请查看浏览器下载列表）';
+    } catch (e) {
+        console.error('record download error:', e);
+        status.textContent = '下载失败：' + e.message;
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 // ─── Audiotype ─────────────────────────────────────────────

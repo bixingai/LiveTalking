@@ -100,6 +100,25 @@ For a shortcut-friendly Windows launch, run `start-local.bat` from this reposito
 
 语音克隆和本地语音识别配置请参考：[语音克隆配置](docs/voice-cloning.md)。
 
+### 2.2.1 本地 Ollama 对话
+
+`Chat LLM` 可以使用本机 Ollama 生成回答，不需要 DashScope API Key。当前 `start-local.bat` 已默认配置为：
+
+```text
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=ornith:latest
+```
+
+启动前请确认 Ollama 正在运行，并且模型已存在：
+
+```bash
+ollama list
+ollama run ornith:latest
+```
+
+Ollama 只生成对话文本；数字人的语音仍由配置的 TTS 服务（例如本地 Qwen3-TTS）合成。手动启动时也可以用环境变量选择 provider：`LLM_PROVIDER=ollama`、`OLLAMA_MODEL=<model>`。
+
 
 >  **注意**: 服务端需开放端口 TCP:5555, UDP:1-65536
 

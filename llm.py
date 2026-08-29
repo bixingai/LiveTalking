@@ -1,14 +1,71 @@
 import time
 import os
+import json
+from urllib.request import Request, urlopen
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from avatars.base_avatar import BaseAvatar
 from utils.logger import logger
 
+def _send_streamed_text(chunks, avatar_session, datainfo, start):
+    """Batch streamed LLM text into short, speakable clauses."""
+    result = ""
+    first = True
+    for msg in chunks:
+        if not msg:
+            continue
+        if first:
+            logger.info(f"llm Time to first chunk: {time.perf_counter() - start}s")
+            first = False
+        lastpos = 0
+        for i, char in enumerate(msg):
+            if char in ",.!;:，。！？：；":
+                result += msg[lastpos:i + 1]
+                lastpos = i + 1
+                if len(result) > 10:
+                    logger.info(result)
+                    avatar_session.put_msg_txt(result, datainfo)
+                    result = ""
+        result += msg[lastpos:]
+    if result:
+        avatar_session.put_msg_txt(result, datainfo)
+
+
+def _ollama_chunks(message):
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    model = os.getenv("OLLAMA_MODEL", "ornith:latest")
+    payload = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "你是一个知识助手，尽量以简短、口语化的方式输出。"},
+            {"role": "user", "content": message},
+        ],
+        "stream": True,
+    }).encode("utf-8")
+    request = Request(
+        f"{base_url}/api/chat",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urlopen(request, timeout=120) as response:
+        for line in response:
+            if not line.strip():
+                continue
+            event = json.loads(line)
+            yield event.get("message", {}).get("content", "")
+
+
 def llm_response(message,avatar_session:'BaseAvatar',datainfo:dict={}):
     try:
-        opt = avatar_session.opt
         start = time.perf_counter()
+        if os.getenv("LLM_PROVIDER", "dashscope").lower() == "ollama":
+            model = os.getenv("OLLAMA_MODEL", "ornith:latest")
+            logger.info(f"llm provider=ollama model={model}")
+            _send_streamed_text(_ollama_chunks(message), avatar_session, datainfo, start)
+            logger.info(f"llm Time to last chunk: {time.perf_counter() - start}s")
+            return
+
         from openai import OpenAI
         client = OpenAI(
             # 如果您没有配置环境变量，请在此处用您的API Key进行替换
@@ -26,34 +83,14 @@ def llm_response(message,avatar_session:'BaseAvatar',datainfo:dict={}):
             # 通过以下设置，在流式输出的最后一行展示token使用信息
             stream_options={"include_usage": True}
         )
-        result=""
-        first = True
-        for chunk in completion:
-            if len(chunk.choices)>0:
-                #print(chunk.choices[0].delta.content)
-                if first:
-                    end = time.perf_counter()
-                    logger.info(f"llm Time to first chunk: {end-start}s")
-                    first = False
-                msg = chunk.choices[0].delta.content
-                if msg is None:
-                    continue
-                lastpos=0
-                #msglist = re.split('[,.!;:，。！?]',msg)
-                for i, char in enumerate(msg):
-                    if char in ",.!;:，。！？：；" :
-                        result = result+msg[lastpos:i+1]
-                        lastpos = i+1
-                        if len(result)>10:
-                            logger.info(result)
-                            avatar_session.put_msg_txt(result,datainfo)
-                            result=""
-                result = result+msg[lastpos:]
-        end = time.perf_counter()
-        logger.info(f"llm Time to last chunk: {end-start}s")
-        if result:
-            avatar_session.put_msg_txt(result,datainfo)
+        _send_streamed_text(
+            (chunk.choices[0].delta.content for chunk in completion if chunk.choices),
+            avatar_session,
+            datainfo,
+            start,
+        )
+        logger.info(f"llm Time to last chunk: {time.perf_counter() - start}s")
         
     except Exception as e:
         logger.exception('llm exceptiopn:')
-        return   
+        return

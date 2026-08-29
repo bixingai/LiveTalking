@@ -77,6 +77,10 @@ def parse_args():
                         help="参考文件名或语音模型ID")
     parser.add_argument('--REF_TEXT', type=str, default=None)
     parser.add_argument('--TTS_SERVER', type=str, default='http://127.0.0.1:9880')
+    parser.add_argument('--omni_tts_src_sr', type=int, default=24000,
+                        help="source sample rate returned by the omnitts server")
+    parser.add_argument('--omni_tts_format', type=str, default='pcm',
+                        help="audio format requested from the omnitts server")
 
     # ─── 传输 ─────────────────────────────────────────────────────────
     parser.add_argument('--transport', type=str, default='webrtc',

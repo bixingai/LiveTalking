@@ -21,6 +21,7 @@ models/
 dist
 .venv/
 .qwen-tts-venv/
+.audio8-venv/
 .run/
 .downloads/
 models/qwen3-tts-voices/

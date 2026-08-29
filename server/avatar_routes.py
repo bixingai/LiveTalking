@@ -119,6 +119,24 @@ async def list_avatar_tasks(request):
     tasks = task_manager.list_tasks()
     return json_ok(data={"tasks": tasks})
 
+async def list_avatar_profiles(request):
+    """GET /api/avatar/profiles - list Avatar data already present on disk."""
+    data_path = os.path.abspath('./data/avatars')
+    profiles = []
+    if os.path.isdir(data_path):
+        for name in sorted(os.listdir(data_path)):
+            avatar_path = os.path.join(data_path, name)
+            if not os.path.isdir(avatar_path):
+                continue
+            required = (
+                os.path.join(avatar_path, 'full_imgs'),
+                os.path.join(avatar_path, 'face_imgs'),
+                os.path.join(avatar_path, 'coords.pkl'),
+            )
+            if all(os.path.exists(path) for path in required):
+                profiles.append({"avatar_id": name, "model": "wav2lip"})
+    return json_ok(data={"profiles": profiles})
+
 async def delete_avatar_task(request):
     """
     DELETE /api/avatar/task/{task_id}
@@ -134,3 +152,4 @@ def setup_avatar_routes(app):
     app.router.add_get("/api/avatar/task/{task_id}", get_avatar_task_status)
     app.router.add_delete("/api/avatar/task/{task_id}", delete_avatar_task)
     app.router.add_get("/api/avatar/tasks", list_avatar_tasks)
+    app.router.add_get("/api/avatar/profiles", list_avatar_profiles)
