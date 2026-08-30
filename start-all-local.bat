@@ -45,9 +45,10 @@ exit /b 0
 set "WAIT_PORT=%~1"
 set /a WAIT_SECONDS=%~2
 :wait_port_loop
-for /f "usebackq delims=" %%A in (`powershell -NoProfile -Command "$x=Get-NetTCPConnection -LocalPort %WAIT_PORT% -State Listen -ErrorAction SilentlyContinue; if($x){'ready'}"`) do if "%%A"=="ready" exit /b 0
+pwsh -NoProfile -Command "$c=New-Object Net.Sockets.TcpClient; try {$c.Connect('127.0.0.1',%WAIT_PORT%); $c.Close(); exit 0} catch {exit 1}"
+if not errorlevel 1 exit /b 0
 if %WAIT_SECONDS% LEQ 0 exit /b 1
-timeout /t 1 /nobreak >nul
+ping 127.0.0.1 -n 2 >nul
 set /a WAIT_SECONDS-=1
 goto :wait_port_loop
 
@@ -56,9 +57,10 @@ set "WAIT_HTTP_PORT=%~1"
 set "WAIT_HTTP_PATH=%~2"
 set /a WAIT_SECONDS=%~3
 :wait_http_loop
-for /f "usebackq delims=" %%A in (`powershell -NoProfile -Command "try{$r=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:%WAIT_HTTP_PORT%%WAIT_HTTP_PATH%' -TimeoutSec 3;if($r.StatusCode -eq 200){'ready'}}catch{}"`) do if "%%A"=="ready" exit /b 0
+pwsh -NoProfile -Command "try { if ((Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:%WAIT_HTTP_PORT%%WAIT_HTTP_PATH%' -TimeoutSec 3).StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }"
+if not errorlevel 1 exit /b 0
 if %WAIT_SECONDS% LEQ 0 exit /b 1
-timeout /t 1 /nobreak >nul
+ping 127.0.0.1 -n 2 >nul
 set /a WAIT_SECONDS-=1
 goto :wait_http_loop
 
