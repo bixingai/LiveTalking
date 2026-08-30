@@ -1,6 +1,8 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
+set "NUMBA_CACHE_DIR=%TEMP%\livetalking-numba-cache"
+if not exist "%NUMBA_CACHE_DIR%" mkdir "%NUMBA_CACHE_DIR%"
 
 echo ==============================================
 echo LiveTalking local startup

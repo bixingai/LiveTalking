@@ -98,6 +98,8 @@ python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 
 For a shortcut-friendly Windows launch, run `start-local.bat` from this repository root.
 
+For the complete local stack, run `start-all-local.bat`. It starts Ollama, Audio8 TTS, and LiveTalking in dependency order. The launchers set a writable `NUMBA_CACHE_DIR` because the Wav2Lip/librosa import can otherwise stall while creating Numba cache files on Windows.
+
 语音克隆和本地语音识别配置请参考：[语音克隆配置](docs/voice-cloning.md)。
 
 ### 2.2.1 本地 Ollama 对话
