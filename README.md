@@ -157,6 +157,8 @@ Ollama 只生成对话文本；数字人的语音仍由配置的 TTS 服务（�
 
 ## 3. 系统架构
 
+BixingAI 的产品协议不写进本仓库。Teachora、Helpora、Shopora 通过独立的内部适配层调用引擎，仓库在 `C:\Coding\BixingAI\presenter-gateway`。本仓库保持可替换的 GPU 引擎。说明见 [docs/presenter-gateway.md](docs/presenter-gateway.md)。
+
 ### 数据流图
 
 <img src="./assets/dataflow.png" align="middle" />
