@@ -271,8 +271,16 @@ class BaseAvatar:
             self._record_audio_pipe.stdin.write(frame.tobytes())
 		
     def stop_recording(self):
-        if not self.recording:
-            return
+        from server.recording import stop_result
+        output_file = os.path.join('data', 'record', f"{self.opt.sessionid}.mp4")
+
+        def finalize():
+            self._finalize_recording(output_file)
+
+        was_recording = self.recording
+        return stop_result(was_recording, output_file, finalize)
+
+    def _finalize_recording(self, output_file):
         self.recording = False 
         self._record_video_pipe.stdin.close()
         self._record_video_pipe.wait()
@@ -281,8 +289,7 @@ class BaseAvatar:
         
         record_path = os.path.join('data', 'record')
         os.makedirs(record_path, exist_ok=True)
-        output_file = os.path.join(record_path, f"{self.opt.sessionid}.mp4")
-        
+
         temp_aac = f"temp{self.opt.sessionid}.aac"
         temp_mp4 = f"temp{self.opt.sessionid}.mp4"
         
@@ -295,6 +302,7 @@ class BaseAvatar:
             os.remove(temp_mp4)
         except Exception as e:
             logger.error(f"Error removing temp files: {e}")
+
 
     # def mirror_index(self, size, index):
     #     turn = index // size

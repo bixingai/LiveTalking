@@ -132,8 +132,12 @@ async def record(request):
             return json_error("session not found")
         if params['type'] == 'start_record':
             avatar_session.start_recording()
+            from server.recording import end_record_body
+            return web.Response(content_type="application/json", text=json.dumps(end_record_body(False)))
         elif params['type'] == 'end_record':
-            avatar_session.stop_recording()
+            from server.recording import end_record_body
+            ready = bool(avatar_session.stop_recording())
+            return web.Response(content_type="application/json", text=json.dumps(end_record_body(ready)))
         return json_ok()
     except Exception as e:
         logger.exception('record exception:')
