@@ -13,6 +13,11 @@ class MaxSessionError(Exception):
     """会话数达到上限时抛出"""
     pass
 
+
+class SessionClosedError(Exception):
+    """会话在构建完成前被关闭"""
+    pass
+
 def _rand_session_id() -> str:
     """生成 UUID session ID"""
     return str(uuid.uuid4())
@@ -79,6 +84,8 @@ class SessionManager:
         avatar_session = await asyncio.get_event_loop().run_in_executor(
             None, self.build_session_fn, sessionid, params
         )
+        if sessionid not in self.sessions:
+            raise SessionClosedError(sessionid)
         self.sessions[sessionid] = avatar_session
         return sessionid
         

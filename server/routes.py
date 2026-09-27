@@ -140,6 +140,34 @@ async def record(request):
         return json_error(str(e))
 
 
+async def close_session(request):
+    """按 sessionid 关闭引擎会话。不接受业务字段。"""
+    try:
+        params = await request.json()
+    except Exception:
+        return json_error("sessionid is required")
+    if not isinstance(params, dict) or set(params) != {"sessionid"}:
+        return json_error("sessionid is required")
+    sessionid = str(params.get("sessionid") or "")
+    if not sessionid:
+        return json_error("sessionid is required")
+    rtc_manager = request.app.get("rtc_manager")
+    if rtc_manager is None:
+        return json_error("session not found")
+    try:
+        closed = await rtc_manager.close_session(sessionid)
+    except Exception:
+        logger.exception("close_session exception:")
+        return json_error("session could not be closed")
+    if not closed:
+        return web.Response(
+            status=404,
+            content_type="application/json",
+            text=json.dumps({"code": -1, "msg": "session not found"}),
+        )
+    return json_ok()
+
+
 async def is_speaking(request):
     """查询是否正在说话"""
     params = await request.json()
@@ -250,6 +278,7 @@ def setup_routes(app):
     app.router.add_post("/record", record)
     app.router.add_post("/interrupt_talk", interrupt_talk)
     app.router.add_post("/is_speaking", is_speaking)
+    app.router.add_post("/session/close", close_session)
     app.router.add_get("/api/admin/config", admin_config)
     app.router.add_get("/api/admin/sessions", admin_sessions)
     app.router.add_get('/sse', sse_handler)

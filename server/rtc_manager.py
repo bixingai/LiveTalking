@@ -22,7 +22,7 @@ from utils.logger import logger
 
 
 from server.session_manager import session_manager
-from server.session_manager import MaxSessionError
+from server.session_manager import MaxSessionError, SessionClosedError
 
 class RTCManager:
     """
@@ -38,6 +38,7 @@ class RTCManager:
         """
         self.opt = opt
         self.pcs: set = set()
+        self.session_pcs: Dict[str, RTCPeerConnection] = {}
 
     async def _create_pc_and_answer(self, avatar_session, sessionid, offer):
         """创建 PeerConnection、添加轨道、SDP 交换，返回已完成 answer 的 pc"""
@@ -46,6 +47,7 @@ class RTCManager:
             configuration=RTCConfiguration(iceServers=[ice_server])
         )
         self.pcs.add(pc)
+        self.session_pcs[str(sessionid)] = pc
 
         @pc.on("connectionstatechange")
         async def on_connectionstatechange():
@@ -53,6 +55,7 @@ class RTCManager:
             if pc.connectionState in ("failed", "closed"):
                 await pc.close()
                 self.pcs.discard(pc)
+                self.session_pcs.pop(str(sessionid), None)
                 session_manager.remove_session(sessionid)
 
         # 添加发送轨道
@@ -75,6 +78,33 @@ class RTCManager:
 
         return pc
 
+    async def close_session(self, sessionid: str) -> bool:
+        """关闭一路引擎会话。会话不存在时返回 False。"""
+        sessionid = str(sessionid)
+        pc = self.session_pcs.get(sessionid)
+        if sessionid not in session_manager.sessions and pc is None:
+            return False
+        avatar_session = session_manager.sessions.get(sessionid)
+        if avatar_session is not None and getattr(avatar_session, "recording", False):
+            try:
+                avatar_session.stop_recording()
+            except Exception:
+                logger.exception("stop recording during close failed")
+        quit_event = getattr(avatar_session, "quit_event", None)
+        if quit_event is not None:
+            quit_event.set()
+        if hasattr(avatar_session, "flush_talk"):
+            try:
+                avatar_session.flush_talk()
+            except Exception:
+                logger.exception("flush talk during close failed")
+        if pc is not None:
+            await pc.close()
+            self.pcs.discard(pc)
+            self.session_pcs.pop(sessionid, None)
+        session_manager.remove_session(sessionid)
+        return True
+
     async def handle_offer(self, request):
         """处理 WebRTC offer 信令"""
         params = await request.json()
@@ -87,6 +117,11 @@ class RTCManager:
             return web.Response(
                 content_type="application/json",
                 text=json.dumps({"code": -1, "msg": str(e)}),
+            )
+        except SessionClosedError:
+            return web.Response(
+                content_type="application/json",
+                text=json.dumps({"code": -1, "msg": "session closed"}),
             )
         logger.info('offer sessionid=%s', sessionid)
 
@@ -128,6 +163,8 @@ class RTCManager:
                 content_type="text/plain",
                 text=str(e),
             )
+        except SessionClosedError:
+            return web.Response(status=409, content_type="text/plain", text="session closed")
         logger.info("whep sessionid=%s", sessionid)
 
         pc = await self._create_pc_and_answer(
