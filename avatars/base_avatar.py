@@ -68,6 +68,7 @@ class BaseAvatar:
         self.sessionid = self.opt.sessionid
 
         self.speaking = False
+        self._speech_queued = False
         self.recording = False
         self._record_video_pipe = None
         self._record_audio_pipe = None
@@ -125,6 +126,8 @@ class BaseAvatar:
 
     # 如果系统没有使用 pipeline，或者为了向后兼容原来的 ttsreal.py
     def put_msg_txt(self, msg, datainfo:dict={}):
+        if msg:
+            self._speech_queued = True
         if hasattr(self, 'tts'):
             self.tts.put_msg_txt(msg, datainfo)
     
@@ -183,6 +186,7 @@ class BaseAvatar:
         return stream
 
     def flush_talk(self):
+        self._speech_queued = False
         if hasattr(self, 'tts') and hasattr(self.tts, 'flush_talk'):
             self.tts.flush_talk()
         if hasattr(self, 'asr') and hasattr(self.asr, 'flush_talk'):
@@ -429,6 +433,7 @@ class BaseAvatar:
                     combine_frame = target_frame
             else:
                 self.speaking = True
+                self._speech_queued = False
                 try:
                     current_frame = self.paste_back_frame(res_frame,idx)
                 except Exception as e:

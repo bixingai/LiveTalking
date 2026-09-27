@@ -175,7 +175,9 @@ async def is_speaking(request):
     avatar_session = get_session(request, sessionid)
     if avatar_session is None:
         return json_error("session not found")
-    return json_ok(data=avatar_session.is_speaking())
+    from server.speech_state import speaking_payload
+    payload = speaking_payload(avatar_session)
+    return web.Response(content_type="application/json", text=json.dumps(payload))
 
 async def sse_handler(request):
     """SSE 事件流，推送服务器状态更新到客户端"""
